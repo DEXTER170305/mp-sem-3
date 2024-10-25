@@ -17,6 +17,7 @@
   "homepage": "https://github.com/DEXTER170305/mp-sem-3#readme",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^4.21.1",
     "mini-project": "file:",
     "mssql": "^11.0.1",
