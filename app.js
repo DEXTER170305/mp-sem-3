@@ -10,17 +10,17 @@ app.use(express.urlencoded({ extended: true }));
 
 // MySQL connection configuration
 const connection = mysql.createConnection({
-    host: 'sql12.freesqldatabase.com',
-    user: 'sql12740647',
-    password: 'LZMZPav1Re',
-    database: 'sql12740647',
+    host: 'sql208.infinityfree.com',
+    user: 'if0_37669762',
+    password: 'KG8V82bHvqJlpFp',
+    database: 'if0_37669762_mini__project',
     port: 3306,
 });
 
 // Connect to MySQL
 connection.connect(err => {
     if (err) {
-        console.error('Database connection failed');
+        console.error('Database connection failed',err);
         return;
     }
     console.log('Connected to MySQL');
