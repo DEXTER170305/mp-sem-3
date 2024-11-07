@@ -22,6 +22,7 @@
     "mini-project": "file:",
     "mssql": "^11.0.1",
     "mysql": "^2.18.1",
-    "mysql2": "^3.11.3"
+    "mysql2": "^3.11.3",
+    "nodemon": "^3.1.7"
   }
 }

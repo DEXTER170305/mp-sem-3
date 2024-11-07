@@ -20,7 +20,7 @@ const connection = mysql.createConnection({
 // Connect to MySQL
 connection.connect(err => {
     if (err) {
-        console.error('Database connection failed', err);
+        console.error('Database connection failed');
         return;
     }
     console.log('Connected to MySQL');
@@ -30,7 +30,7 @@ connection.connect(err => {
 app.post('/signup', (req, res) => {
     const { name, email, password, 'confirm-password': confirmPassword } = req.body; // Destructure to get confirmPassword
     console.log('Post request is hit');
-    console.log('Received data:', req.body);
+    console.log('Received data :', req.body);
     
     // Validate all fields
     if (!name || !email || !password || !confirmPassword) {
@@ -58,6 +58,47 @@ app.post('/signup', (req, res) => {
             }
             console.log('Registration successful');
             res.status(201).send('User registered successfully');
+        });
+    });
+});
+
+
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+        return res.status(400).send('Email and password are required');
+    }
+
+    // Query to find the user by email
+    const query = 'SELECT * FROM STUDENT_LOGIN WHERE EMAIL = ?';
+    connection.query(query, [email], (error, results) => {
+        if (error) {
+            console.error('SQL error', error);
+            return res.status(500).send('Internal Server Error');
+        }
+
+        // Check if user exists
+        if (results.length === 0) {
+            return res.status(400).send('User not found');
+        }
+
+        const user = results[0];
+
+        // Compare the provided password with the stored hashed password
+        bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
+            if (err) {
+                console.error('Error comparing passwords', err);
+                return res.status(200).redirect('#');
+            }
+
+            if (isMatch) {
+                res.status(200).redirect('#');
+            } else {
+                res.status(400).send('Invalid email or password');
+            }
         });
     });
 });
