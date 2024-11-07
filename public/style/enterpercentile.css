@@ -8,26 +8,56 @@
 body {
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f5f5f5;
+    background-color: #ffffff;
+    flex-wrap: wrap;
 }
 
+.header {
+    background-color: #0c1c38;
+    color: white;
+    width: 100%; 
+    padding: 15px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    flex-wrap: wrap;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.contact-info {
+    font-size: 0.9rem;
+}
+
+.contact-info a {
+    color: white;
+    text-decoration: none;
+}
+
+/* Adjust for the page content */
 .container {
-    background-color: #ffffff;
+    margin-top: 150px;  /* Account for the fixed header height */
     padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 100%;
-    max-width: 350px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.container:hover {
-    transform: scale(1.05);
+    max-width: 600px;
+    background-color: #ffffff;
 }
 
 h2 {
