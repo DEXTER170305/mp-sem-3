@@ -307,3 +307,9 @@ button {
 .login-link a:hover {
     text-decoration: underline;
 }
+
+.error-message {
+    color: red; /* Sets the text color to red */
+    font-size: 14px; /* Adjusts the font size */
+    margin-top: 5px; /* Adds space between the input field and the error message */
+}

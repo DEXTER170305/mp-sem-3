@@ -1,101 +1,105 @@
 const express = require('express');
-const mysql = require('mysql');
-const bcrypt = require('bcrypt'); // Import bcrypt
+const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
 const app = express();
-const port = 3000; // Server port
+const port = 3000;
 
-// Middleware to parse incoming JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// MySQL connection configuration
-const connection = mysql.createConnection({
-    host: 'sql208.infinityfree.com',
-    user: 'if0_37669762',
-    password: 'KG8V82bHvqJlpFp',
-    database: 'if0_37669762_mini__project',
-    port: 3306,
+// Configure PostgreSQL connection
+const pool = new Pool({
+    host: 'dpg-csnih5ij1k6c73b426tg-a.oregon-postgres.render.com',
+    user: 'mpdb_postgresql_user',
+    password: 'KhnX13ABQQKqR8xmXjUc8MjKboifh0s6',
+    database: 'mpdb_postgresql',
+    port: 5432,
+    ssl: {
+        rejectUnauthorized: false // Disable SSL certificate verification
+    }
 });
 
-// Connect to MySQL
-connection.connect(err => {
+pool.connect(err => {
     if (err) {
-        console.error('Database connection failed',err);
+        console.error('Database connection failed', err);
         return;
     }
-    console.log('Connected to MySQL');
+    console.log('Connected to PostgreSQL');
 });
 
-// Sign-up route
 app.post('/signup', (req, res) => {
-    const { name, email, password, 'confirm-password': confirmPassword } = req.body; // Destructure to get confirmPassword
+    const { name, email, password, 'confirm-password': confirmPassword } = req.body;
     console.log('Post request is hit');
-    console.log('Received data :', req.body);
-    
-    // Validate all fields
+    console.log('Received data:', req.body);
+
     if (!name || !email || !password || !confirmPassword) {
         return res.status(400).send('All fields are required');
     }
 
-    // Check if password and confirm password match
     if (password !== confirmPassword) {
         return res.status(400).send('Passwords do not match');
     }
 
-    // Hash the password before storing it
     bcrypt.hash(password, 10, (err, hashedPassword) => {
         if (err) {
             console.error('Error hashing password', err);
             return res.status(500).send('Internal Server Error');
         }
 
-        // Insert the new user into the database
-        const query = 'INSERT INTO STUDENT_LOGIN (NAME, EMAIL, PASSWORD) VALUES (?, ?, ?)';
-        connection.query(query, [name, email, hashedPassword], (error, results) => {
+        const query = 'INSERT INTO STUDENT_LOGIN (NAME, EMAIL, PASSWORD) VALUES ($1, $2, $3)';
+        pool.query(query, [name, email, hashedPassword], (error, results) => {
             if (error) {
+                // Check for duplicate email error
+                if (error.code === '23505') {
+                    console.log('Email already in use');
+                    return res.status(409).json({ error: 'Email already in use' });
+                }
                 console.error('SQL error', error);
                 return res.status(500).send('Internal Server Error');
             }
             console.log('Registration successful');
-            res.status(201).send('User registered successfully');
+            res.redirect('/enterpercentile.html');
         });
     });
 });
 
 
-
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-    // Check if email and password are provided
     if (!email || !password) {
         return res.status(400).send('Email and password are required');
     }
 
-    // Query to find the user by email
-    const query = 'SELECT * FROM STUDENT_LOGIN WHERE EMAIL = ?';
-    connection.query(query, [email], (error, results) => {
+    const query = 'SELECT * FROM STUDENT_LOGIN WHERE EMAIL = $1';
+    console.log('login request is hit..');
+    
+    pool.query(query, [email], (error, results) => {
         if (error) {
             console.error('SQL error', error);
             return res.status(500).send('Internal Server Error');
         }
 
-        // Check if user exists
-        if (results.length === 0) {
+        if (results.rows.length === 0) {
             return res.status(400).send('User not found');
         }
 
-        const user = results[0];
-
-        // Compare the provided password with the stored hashed password
-        bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
+        const user = results.rows[0];
+        
+        // Convert bytea to string using encoding
+        const hashedPassword = user.password.toString('utf-8'); 
+        console.log('Database hashed password:', hashedPassword);
+        console.log('Entered password:', password);
+        
+        // Compare with bcrypt
+        bcrypt.compare(password, hashedPassword, (err, isMatch) => {
             if (err) {
                 console.error('Error comparing passwords', err);
-                return res.status(200).redirect('#');
+                return res.status(500).send('Internal Server Error');
             }
 
             if (isMatch) {
-                res.status(200).redirect('#');
+                res.status(200).redirect('/enterpercentile.html');
             } else {
                 res.status(400).send('Invalid email or password');
             }
@@ -103,12 +107,9 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Serve static files (optional)
-app.use(express.static('public')); // Assuming your HTML file is in a folder named 'public'
 
-// Adjust path as needed
+app.use(express.static('public'));
 
-// Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
