@@ -1,0 +1,206 @@
+/* General styling */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #eef2f7; /* Light blue-gray background */
+  color: #333;
+}
+
+/* App container */
+.app-container {
+  display: flex;
+  width: 100%;
+}
+
+/* Sidebar styling */
+.filter-sidebar {
+  width: 300px;
+  background-color: #ffffff;
+  border-right: 1px solid #d1d9e6;
+  padding: 20px;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.filter-sidebar:hover {
+  background-color: #f8faff; /* Light hover effect */
+}
+
+.filter-sidebar h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #162d59;
+}
+
+.filter-sidebar label {
+  font-weight: bold;
+  display: block;
+  margin: 10px 0 5px;
+}
+
+.filter-sidebar select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #a6b8c7;
+  border-radius: 6px;
+  background-color: #f3f7fc;
+  transition: border-color 0.3s ease;
+}
+
+.filter-sidebar select:focus {
+  border-color: #162d59;
+  outline: none;
+}
+
+/* College list styling */
+.college-list {
+  flex: 1;
+  padding: 20px;
+}
+
+.college-card {
+  background-color: #ffffff;
+  border: 1px solid #d1d9e6;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.college-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.college-card h4 {
+  margin: 0 0 10px;
+  color: #162d59;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.college-card p {
+  margin: 5px 0;
+  color: #4d4d4d;
+}
+
+.college-card p strong {
+  color: #333;
+}
+
+.college-name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+  font-size: 18px;
+}
+
+.arrow {
+  font-size: 16px;
+  color: #999;
+  transition: transform 0.3s ease;
+}
+
+.college-details {
+  margin-top: 15px;
+  border-top: 1px solid #d1d9e6;
+  padding-top: 15px;
+  color: #555;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Table styling */
+.branch-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.branch-table th, .branch-table td {
+  border: 1px solid #d1d9e6;
+  padding: 10px;
+  text-align: left;
+}
+
+.branch-table th {
+  background-color: #f3f7fc;
+  font-weight: bold;
+}
+
+.branch-table tr:nth-child(even) {
+  background-color: #f8faff;
+}
+
+.branch-table tr:hover {
+  background-color: #eef2f7;
+  transition: background-color 0.3s ease;
+}
+
+/* Button styling */
+.apply-button, .download-button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.apply-button {
+  background-color: #162d59;
+  color: #fff;
+}
+
+.apply-button:hover {
+  background-color: #162d59;
+  transform: translateY(-2px);
+}
+
+.download-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.download-button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+/* Header and layout styling */
+.header {
+  background-color: #162d59;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+  border-bottom: 3px solid #162d59;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.FilterSidebar {
+  width: 25%;
+  margin-right: 20px;
+}
+
+.CollegeList {
+  width: 75%;
+}

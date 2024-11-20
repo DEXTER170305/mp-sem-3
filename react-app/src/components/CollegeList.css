@@ -1,0 +1,67 @@
+.college-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px;
+  }
+  
+  .college-item {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  
+  .college-item:hover {
+    transform: scale(1.02);
+  }
+  
+  .college-item h3 {
+    margin: 0 0 10px;
+    font-size: 1.5em;
+  }
+  
+  .college-item p {
+    margin: 5px 0;
+    color: #555;
+  }
+  .college-list {
+    padding: 20px;
+  }
+  
+  .college-card {
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+  }
+  
+  .college-name {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2em;
+  }
+  
+  .college-details {
+    margin-top: 10px;
+  }
+  
+  .branch-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .branch-table th, .branch-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .branch-table th {
+    background-color: #f4f4f4;
+  }
+    

@@ -2,7 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +26,8 @@ pool.connect(err => {
     }
     console.log('Connected to PostgreSQL');
 });
+
+
 
 app.post('/signup', (req, res) => {
     const { name, email, password, 'confirm-password': confirmPassword } = req.body;
@@ -99,7 +101,7 @@ app.post('/login', (req, res) => {
             }
 
             if (isMatch) {
-                res.status(200).redirect('/enterpercentile.html');
+                res.redirect('http://localhost:3000');
             } else {
                 res.status(400).send('Invalid email or password');
             }
@@ -107,6 +109,73 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.post('/enter-percentile', (req, res) => {
+    const { exam, percentile, branch, category } = req.body;
+
+    if (!exam || !percentile || !branch || !category) {
+        return res.status(400).send('All fields are required');
+    }
+
+    // Process the data (You can save it to the database or perform other logic)
+    console.log('Received data:', req.body);
+
+    // Redirect to React app (localhost:3000)
+    res.redirect('http://localhost:3000');
+});
+
+app.get('/get-colleges', (req, res) => {
+    console.log("college data request hit");
+    const query = `
+        SELECT 
+            COLLEGE.COLLEGE_NAME AS name, 
+            COLLEGE.INSTITUTE_CODE AS institutionCode, 
+            COLLEGE.NIRF_RANK AS nirfRank, 
+            COLLEGE.CITY AS location, 
+            COLLEGE.HOME_UNIVERSITY AS branch, 
+            COLLEGE.STATUS AS status,
+            COLLEGE.HOBBY AS hobby,
+            CUTOFF.BRANCH AS branchName, 
+            CUTOFF.OPEN AS cutoff
+        FROM COLLEGE 
+        LEFT JOIN CUTOFF ON COLLEGE.INSTITUTE_CODE = CUTOFF.INSTITUTE_CODE
+    `;
+
+    pool.query(query, (err, result) => {
+        if (err) {
+            return res.status(500).send('Error fetching college data');
+        }
+        
+        // Process the result to group branches and cutoffs by college
+        const colleges = result.rows.reduce((acc, row) => {
+            // Check if the college already exists in the accumulator
+            let college = acc.find(c => c.institutionCode === row.institutionCode);
+            if (!college) {
+                // Create a new college entry if it doesn’t exist
+                college = {
+                    name: row.name,
+                    institutionCode: row.institutionCode,
+                    nirfRank: row.nirfRank,
+                    location: row.location,
+                    branch: row.branch,
+                    status: row.status,
+                    hobbies: row.hobby ? row.hobby.split(', ') : [],
+                    branches: []
+                };
+                acc.push(college);
+            }
+
+            // Add branch and cutoff information
+            college.branches.push({
+                name: row.branchName,
+                cutoff: row.cutoff
+            });
+
+            return acc;
+        }, []);
+
+        res.json(colleges); // Send the formatted data back to the client
+    });
+});
 
 app.use(express.static('public'));
 
