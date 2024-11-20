@@ -74,6 +74,9 @@ body {
   .dropdown-content a:hover {background-color: #f1f1f1}
   
   .dropdown:hover .dropdown-content {
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.2);
     display: block;
   }
   
@@ -164,15 +167,19 @@ button {
 
 /* Additional CSS for Login Page */
 .login-section {
+    background-image:url('backimg.jpeg.jpg') ;
     height: 80vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f4f4f4;
+    background-color: #f4f4f44b;
 }
 
+
+
 .login-container {
-    background-color: white;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.2);
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
@@ -194,8 +201,10 @@ button {
 .input-group label {
     display: block;
     margin-bottom: 5px;
-    color: #333;
+    color: #000000;
 }
+
+
 
 .input-group input {
     width: 100%;
@@ -224,6 +233,7 @@ button {
 .signup-link {
     margin-top: 15px;
     font-size: 0.9em;
+    color: black;
 }
 
 .signup-link a {
@@ -237,15 +247,17 @@ button {
 
 /* Additional CSS for Signup Page */
 .signup-section {
+    background-image:url('backimg.jpeg.jpg') ;
     height: 80vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f4f4f4;
+    background-color: #f4f4f44b;
 }
 
 .signup-container {
-    background-color: white;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.2);
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
@@ -267,7 +279,9 @@ button {
 .input-group label {
     display: block;
     margin-bottom: 5px;
-    color: #333;
+    color: #000000;
+    font-size: 140%;
+    font-weight: 500;
 }
 
 .input-group input {
@@ -297,6 +311,7 @@ button {
 .login-link {
     margin-top: 15px;
     font-size: 0.9em;
+    color: black;
 }
 
 .login-link a {
