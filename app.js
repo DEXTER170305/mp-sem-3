@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt');
 const app = express();
 const port = 5000;
 
+const cors = require('cors');
+app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -123,59 +126,105 @@ app.post('/enter-percentile', (req, res) => {
     res.redirect('http://localhost:3000');
 });
 
-app.get('/get-colleges', (req, res) => {
-    console.log("college data request hit");
-    const query = `
-        SELECT 
-            COLLEGE.COLLEGE_NAME AS name, 
-            COLLEGE.INSTITUTE_CODE AS institutionCode, 
-            COLLEGE.NIRF_RANK AS nirfRank, 
-            COLLEGE.CITY AS location, 
-            COLLEGE.HOME_UNIVERSITY AS branch, 
-            COLLEGE.STATUS AS status,
-            COLLEGE.HOBBY AS hobby,
-            CUTOFF.BRANCH AS branchName, 
-            CUTOFF.OPEN AS cutoff
-        FROM COLLEGE 
-        LEFT JOIN CUTOFF ON COLLEGE.INSTITUTE_CODE = CUTOFF.INSTITUTE_CODE
-    `;
+app.get('/get-colleges', async (req, res) => {
+    console.log('Query received:', req.query);
+    try {
+        // Extract filters from the query parameters
+        const { branch, hobbies } = req.query;
 
-    pool.query(query, (err, result) => {
-        if (err) {
-            return res.status(500).send('Error fetching college data');
+        // Start building the base SQL query
+        let query = `
+            SELECT 
+                COLLEGE.COLLEGE_NAME,
+                COLLEGE.INSTITUTE_CODE,
+                COLLEGE.NIRF_RANK,
+                COLLEGE.CITY,
+                COLLEGE.HOME_UNIVERSITY,
+                COLLEGE.STATUS,
+                COLLEGE.HOBBY,
+                CUTOFF.BRANCH,
+                CUTOFF.OPEN
+            FROM COLLEGE 
+            LEFT JOIN CUTOFF ON COLLEGE.INSTITUTE_CODE = CUTOFF.INSTITUTE_CODE
+        `;
+
+        let conditions = [];
+        let queryParams = [];
+
+        // Apply filters if provided
+        if (branch) {
+            conditions.push(`CUTOFF.BRANCH ILIKE $${queryParams.length + 1}`);
+            queryParams.push(`%${branch}%`); // Case-insensitive search for the branch
         }
-        
-        // Process the result to group branches and cutoffs by college
+
+        if (hobbies) {
+            // Split hobbies into an array and apply filter for each hobby
+            const hobbiesArray = hobbies.split(',');
+            hobbiesArray.forEach((hobby, index) => {
+                conditions.push(`COLLEGE.HOBBY ILIKE $${queryParams.length + 1}`);
+                queryParams.push(`%${hobby.trim()}%`); // Case-insensitive match for each hobby
+            });
+        }
+
+        // If any conditions are set, add them to the query
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        // Query the database with the dynamic filters
+        const result = await pool.query(query, queryParams);
+
+        // Process the result into a more structured format
         const colleges = result.rows.reduce((acc, row) => {
-            // Check if the college already exists in the accumulator
-            let college = acc.find(c => c.institutionCode === row.institutionCode);
+            const institutioncode = String(row.institute_code);
+            const nirfrank = row.nirf_rank !== null ? String(row.nirf_rank) : 'N/A';
+            const name = row.college_name || '';
+            const location = row.city || '';
+            const university = row.home_university || '';
+            const status = row.status || '';
+            const hobbies = row.hobby ? row.hobby.split(', ') : [];
+            const branchname = row.branch || '';
+            const cutoff = row.open !== null ? String(row.open) : '0';
+
+            // Check if the college is already in the accumulator
+            let college = acc.find(c => c.institutioncode === institutioncode);
             if (!college) {
-                // Create a new college entry if it doesn’t exist
+                // If not, create a new college entry
                 college = {
-                    name: row.name,
-                    institutionCode: row.institutionCode,
-                    nirfRank: row.nirfRank,
-                    location: row.location,
-                    branch: row.branch,
-                    status: row.status,
-                    hobbies: row.hobby ? row.hobby.split(', ') : [],
-                    branches: []
+                    name,
+                    institutioncode,
+                    nirfrank,
+                    location,
+                    university,
+                    status,
+                    hobbies,
+                    branches: [] // Empty array for branches
                 };
                 acc.push(college);
             }
 
-            // Add branch and cutoff information
-            college.branches.push({
-                name: row.branchName,
-                cutoff: row.cutoff
-            });
+            // Add the branch and cutoff information to the college
+            if (branchname) {
+                college.branches.push({
+                    branchname,
+                    cutoff,
+                });
+            }
 
             return acc;
-        }, []);
+        }, []); // Empty array for the accumulator
 
-        res.json(colleges); // Send the formatted data back to the client
-    });
+        // Send the processed data as a JSON response
+        res.json(colleges);
+    } catch (error) {
+        console.error('Error fetching colleges:', error);
+        res.status(500).json({ error: 'An error occurred while fetching data.' });
+    }
 });
+
+
+
+
 
 app.use(express.static('public'));
 

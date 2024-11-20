@@ -64,7 +64,7 @@ body {
   background-color: #ffffff;
   border: 1px solid #d1d9e6;
   border-radius: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -202,5 +202,5 @@ body {
 }
 
 .CollegeList {
-  width: 75%;
+width:75%;
 }

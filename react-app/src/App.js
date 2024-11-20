@@ -8,24 +8,30 @@ import './App.css';
 function App() {
   const [filters, setFilters] = useState({
     branch: '',
-    homeUniversity: '',
+    category: '',  // Added category for filtering colleges
     ownership: '',
     hobbies: []
   });
 
   const handleFilterChange = (filterName, value) => {
-    setFilters({
+    const updatedFilters = {
       ...filters,
-      [filterName]: value,
-    });
+      [filterName]: value === '' ? '' : value,
+    };
+    console.log("Filter Updated:", updatedFilters); // Debug updated filters
+    setFilters(updatedFilters);
   };
-
+  
   const handleHobbyChange = (selectedHobbies) => {
+    console.log("Hobby Filter Updated:", selectedHobbies); // Debug hobbies
     setFilters({
       ...filters,
       hobbies: selectedHobbies,
     });
   };
+  
+  console.log("Rendering App with Filters:", filters);
+  
 
   return (
     <div className="App">

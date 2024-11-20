@@ -7,14 +7,23 @@ function HobbyFilter({ onHobbyChange }) {
 
   const hobbiesList = [
     'Sports',
+    'Seminars',
+    'Technical Seminars',
     'Coding',
     'Hackathons',
-    'Cultural Activities',
+    'Cultural Events',
     'Tech Workshops',
     'Social Work',
     'Art',
+    'Innovation',
+    'Innovation & Research',
+    'Community Service',
+    'Community Outreach',
     'Music',
-    'Research and Development',
+    'Entrepreneurship',
+    'Research',
+    'Research Projects',
+    'Research & Development',
     'Industry Training',
     'Robotics'
   ];
