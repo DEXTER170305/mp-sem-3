@@ -20,8 +20,16 @@ const CollegeList = ({ filters }) => {
 
         if (filters.branch) queryParams.append('branch', filters.branch);
         if (filters.hobbies.length > 0) queryParams.append('hobbies', filters.hobbies.join(','));
+        if (filters.category) {
+          queryParams.append('category', filters.category.toLowerCase());
+        } else {
+          queryParams.append('category', 'open'); // Default to 'open'
+        }
+        
 
         console.log("Query Params:", queryParams.toString());
+        console.log("Query URL:", `http://localhost:5000/get-colleges?${queryParams.toString()}`);
+
 
         const response = await fetch(`http://localhost:5000/get-colleges?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Failed to fetch data');
@@ -45,14 +53,30 @@ const CollegeList = ({ filters }) => {
       const matchesBranch = filters.branch
         ? college.branches.some((b) => b.branchname.toLowerCase().includes(filters.branch.toLowerCase()))
         : true;
+
       const matchesHobbies = filters.hobbies.length
         ? filters.hobbies.every((hobby) => college.hobbies.includes(hobby))
         : true;
+
       const matchesOwnership = filters.ownership
         ? college.status.toLowerCase().includes(filters.ownership.toLowerCase())
         : true;
 
-      return matchesBranch && matchesHobbies && matchesOwnership;
+      const matchesCity = filters.homeUniversity
+        ? college.location.toLowerCase().includes(filters.homeUniversity.toLowerCase())
+        : true;
+
+      // Check if the college has at least one valid branch within the cutoff range
+      const hasValidBranch = college.branches.some((branch) => {
+        return (
+          !filters.percentile || // If no percentile is provided, consider all branches valid
+          (parseFloat(branch.cutoff) >= parseFloat(filters.percentile) - 3 &&
+           parseFloat(branch.cutoff) <= parseFloat(filters.percentile) + 3)
+        );
+      });
+
+      // Include the college only if all filters match and it has a valid branch
+      return matchesBranch && matchesHobbies && matchesOwnership && matchesCity && hasValidBranch;
     });
 
     // Sort filtered colleges by NIRF Rank (ascending)
@@ -92,14 +116,31 @@ const CollegeList = ({ filters }) => {
                 <p><strong>Hobbies:</strong> {college.hobbies.join(', ')}</p>
                 <p><strong>Status:</strong> {college.status}</p>
                 <p><strong>University:</strong> {college.university}</p>
-                <p><strong>Branches:</strong></p>
-                <ul>
-                  {college.branches.map((branch, idx) => (
-                    <li key={idx}>
-                      {branch.branchname} (Cutoff: {branch.cutoff})
-                    </li>
-                  ))}
-                </ul>
+                <h5>Branches and Cutoffs:</h5>
+                <table className="branch-table">
+                  <thead>
+                    <tr>
+                      <th>Branch</th>
+                      <th>Cutoff</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {college.branches
+                      .filter((branch) => {
+                        return (
+                          !filters.percentile || // If no percentile is provided, show all branches
+                          (parseFloat(branch.cutoff) >= parseFloat(filters.percentile) - 3 &&
+                           parseFloat(branch.cutoff) <= parseFloat(filters.percentile) + 3)
+                        );
+                      })
+                      .map((branch, idx) => (
+                        <tr key={idx}>
+                          <td>{branch.branchname}</td>
+                          <td>{branch.cutoff}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

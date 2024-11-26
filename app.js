@@ -36,6 +36,8 @@ app.post('/signup', (req, res) => {
     const { name, email, password, 'confirm-password': confirmPassword } = req.body;
     console.log('Post request is hit');
     console.log('Received data:', req.body);
+    const parsedPercentile = parseFloat(req.body.percentile);
+    console.log(parsedPercentile);
 
     if (!name || !email || !password || !confirmPassword) {
         return res.status(400).send('All fields are required');
@@ -51,8 +53,10 @@ app.post('/signup', (req, res) => {
             return res.status(500).send('Internal Server Error');
         }
 
-        const query = 'INSERT INTO STUDENT_LOGIN (NAME, EMAIL, PASSWORD) VALUES ($1, $2, $3)';
-        pool.query(query, [name, email, hashedPassword], (error, results) => {
+        
+
+        const query = 'INSERT INTO STUDENT_LOGIN (NAME, EMAIL, PASSWORD, PERCENTILE) VALUES ($1, $2, $3, $4)';
+        pool.query(query, [name, email, hashedPassword ,parsedPercentile], (error, results) => {
             if (error) {
                 // Check for duplicate email error
                 if (error.code === '23505') {
@@ -63,7 +67,7 @@ app.post('/signup', (req, res) => {
                 return res.status(500).send('Internal Server Error');
             }
             console.log('Registration successful');
-            res.redirect('/enterpercentile.html');
+            res.redirect('http://localhost:3000');
         });
     });
 });
@@ -72,41 +76,45 @@ app.post('/signup', (req, res) => {
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
+    // Ensure both email and password are provided
     if (!email || !password) {
-        return res.status(400).send('Email and password are required');
+        return res.status(400).json({ message: 'Email and password are required' });
     }
 
     const query = 'SELECT * FROM STUDENT_LOGIN WHERE EMAIL = $1';
-    console.log('login request is hit..');
-    
+    console.log('Login request received..');
+
     pool.query(query, [email], (error, results) => {
         if (error) {
             console.error('SQL error', error);
-            return res.status(500).send('Internal Server Error');
+            return res.status(500).json({ message: 'Internal Server Error' });
         }
 
         if (results.rows.length === 0) {
-            return res.status(400).send('User not found');
+            // No user found with the provided email
+            return res.status(400).json({ message: 'User not found' });
         }
 
         const user = results.rows[0];
-        
-        // Convert bytea to string using encoding
-        const hashedPassword = user.password.toString('utf-8'); 
+
+        // Convert bytea to string (for password in the database) and compare
+        const hashedPassword = user.password.toString('utf-8');
         console.log('Database hashed password:', hashedPassword);
         console.log('Entered password:', password);
-        
-        // Compare with bcrypt
+
+        // Compare entered password with hashed password
         bcrypt.compare(password, hashedPassword, (err, isMatch) => {
             if (err) {
                 console.error('Error comparing passwords', err);
-                return res.status(500).send('Internal Server Error');
+                return res.status(500).json({ message: 'Internal Server Error' });
             }
 
             if (isMatch) {
-                res.redirect('http://localhost:3000');
+                // Password matches, send redirect URL as JSON response
+                res.json({ redirectUrl: 'http://localhost:3000' });
             } else {
-                res.status(400).send('Invalid email or password');
+                // Password does not match, send error message
+                res.status(400).json({ message: 'Invalid email or password' });
             }
         });
     });
@@ -128,10 +136,13 @@ app.post('/enter-percentile', (req, res) => {
 
 app.get('/get-colleges', async (req, res) => {
     console.log('Query received:', req.query);
+    const category = req.query.category;
+    console.log(category);
     try {
         // Extract filters from the query parameters
         const { branch, hobbies } = req.query;
-
+        
+        
         // Start building the base SQL query
         let query = `
             SELECT 
@@ -143,7 +154,7 @@ app.get('/get-colleges', async (req, res) => {
                 COLLEGE.STATUS,
                 COLLEGE.HOBBY,
                 CUTOFF.BRANCH,
-                CUTOFF.OPEN
+                CUTOFF.${category} 
             FROM COLLEGE 
             LEFT JOIN CUTOFF ON COLLEGE.INSTITUTE_CODE = CUTOFF.INSTITUTE_CODE
         `;
@@ -184,7 +195,7 @@ app.get('/get-colleges', async (req, res) => {
             const status = row.status || '';
             const hobbies = row.hobby ? row.hobby.split(', ') : [];
             const branchname = row.branch || '';
-            const cutoff = row.open !== null ? String(row.open) : '0';
+            const cutoff = row[category] !== null ? String(row[category]) : '0';
 
             // Check if the college is already in the accumulator
             let college = acc.find(c => c.institutioncode === institutioncode);
@@ -210,7 +221,7 @@ app.get('/get-colleges', async (req, res) => {
                     cutoff,
                 });
             }
-
+            console.log(college.branches)
             return acc;
         }, []); // Empty array for the accumulator
 

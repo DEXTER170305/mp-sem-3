@@ -1,0 +1,29 @@
+.percentile-filter {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .percentile-filter label {
+    margin-left: 75%;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #162d59;
+  }
+  
+  .percentile-filter input {
+    margin-left: 75%;
+    width: 20%;
+    padding: 8px;
+    border: 1px solid #a6b8c7;
+    border-radius: 6px;
+    background-color: #f3f7fc;
+    transition: border-color 0.3s ease;
+  }
+  
+  .percentile-filter input:focus {
+    border-color: #162d59;
+    outline: none;
+  }
+  

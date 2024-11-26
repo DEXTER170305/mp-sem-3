@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import FilterSidebar from './components/FilterSidebar';
 import CollegeList from './components/CollegeList';
 import Header from './components/Header';
-import HobbyFilter from './components/HobbyFilter'; // New component for hobby filter
+import HobbyFilter from './components/HobbyFilter';
+import PercentileFilter from './components/PercentileFilter'; // Import Percentile Filter
 import './App.css';
 
 function App() {
   const [filters, setFilters] = useState({
     branch: '',
-    category: '',  // Added category for filtering colleges
+    category: '',
     ownership: '',
-    hobbies: []
+    hobbies: [],
+    homeUniversity: '',
+    percentile: '', // Add percentile to filters
   });
 
   const handleFilterChange = (filterName, value) => {
@@ -18,25 +21,28 @@ function App() {
       ...filters,
       [filterName]: value === '' ? '' : value,
     };
-    console.log("Filter Updated:", updatedFilters); // Debug updated filters
     setFilters(updatedFilters);
   };
-  
+
   const handleHobbyChange = (selectedHobbies) => {
-    console.log("Hobby Filter Updated:", selectedHobbies); // Debug hobbies
     setFilters({
       ...filters,
       hobbies: selectedHobbies,
     });
   };
-  
-  console.log("Rendering App with Filters:", filters);
-  
+
+  const handlePercentileChange = (value) => {
+    setFilters({
+      ...filters,
+      percentile: value,
+    });
+  };
 
   return (
     <div className="App">
       <Header />
       <HobbyFilter onHobbyChange={handleHobbyChange} />
+      <PercentileFilter onPercentileChange={handlePercentileChange} />
       <div className="main-content">
         <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
         <CollegeList filters={filters} />

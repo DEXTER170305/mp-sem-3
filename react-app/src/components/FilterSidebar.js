@@ -4,6 +4,24 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
   return (
     <div className="filter-sidebar">
       <h3>Filters</h3>
+      
+      <div>
+        <label>City</label>
+        <select onChange={(e) => onFilterChange('homeUniversity', e.target.value)}>
+          <option value="">All</option>
+          <option value="Aurangabad">Aurangabad</option>
+          <option value="Dombivli">Dombivli</option>
+          <option value="Kolhapur">Kolhapur</option>
+          <option value="Mumbai">Mumbai</option>
+          <option value="Nagpur">Nagpur</option>
+          <option value="Nashik">Nashik</option>
+          <option value="Navi Mumbai">Navi Mumbai</option>
+          <option value="Pune">Pune</option>
+          <option value="Sangli">Sangli</option>
+          {/* Add more cities */}
+        </select>
+      </div>
+
       <div>
         {/* Category filter */}
         <div>
